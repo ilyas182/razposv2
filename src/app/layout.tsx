@@ -7,6 +7,7 @@ import { ApiProvider } from "./context/ApiContext";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
 import ConnectionStatus from "./components/ConnectionStatus";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -37,6 +38,7 @@ export default function RootLayout({
             },
           }}
         />
+        <AuthProvider>
         <ApiProvider>
           <CartProvider>
             <Suspense fallback={<div>Loading...</div>}>
@@ -50,6 +52,7 @@ export default function RootLayout({
             </Suspense>
           </CartProvider>
         </ApiProvider>
+        </AuthProvider>
       </body>
     </html>
   );
