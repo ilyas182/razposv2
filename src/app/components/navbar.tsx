@@ -1,13 +1,15 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Home01, Box, FileX01, BarChart01, Settings01, Ticket01 } from "@untitledui/icons";
+import { Home01, Box, FileX01, BarChart01, Settings01, Ticket01, LogOut01, LogIn01} from "@untitledui/icons";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import type { NavItemType } from "@/components/application/app-navigation/config";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -68,6 +70,12 @@ export default function Navbar() {
       href: "/settings",
       icon: Settings01,
     },
+    {
+      label: isAuthenticated ? "Logout" : "Login",
+      href: isAuthenticated ? "/logout" : "/login",
+      icon: isAuthenticated ? LogOut01 : LogIn01,
+    },
+      
   ];
 
   // @ts-expect-error ignore: SidebarNavigationSimple is a client component and cannot be rendered on the server
