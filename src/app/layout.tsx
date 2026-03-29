@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
 import ConnectionStatus from "./components/ConnectionStatus";
 import { AuthProvider } from "./context/AuthContext";
+import AuthGuard from "./components/AuthGuard";
 
 export default function RootLayout({
   children,
@@ -41,15 +42,17 @@ export default function RootLayout({
         <AuthProvider>
         <ApiProvider>
           <CartProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-            <div className="min-h-screen">
-              <Navbar />
-              {/* Main content that properly accounts for sidebar width */}
-              <main className="main-content-with-sidebar py-4 px-4 sm:px-6 lg:px-3 lg:py-6 safe-area-inset">
-                  <div className="w-full">{children}</div>
-                </main>
-              </div>
-            </Suspense>
+            <AuthGuard>
+              <Suspense fallback={<div>Loading...</div>}>
+              <div className="min-h-screen">
+                <Navbar />
+                {/* Main content that properly accounts for sidebar width */}
+                <main className="main-content-with-sidebar py-4 px-4 sm:px-6 lg:px-3 lg:py-6 safe-area-inset">
+                    <div className="w-full">{children}</div>
+                  </main>
+                </div>
+              </Suspense>
+            </AuthGuard>
           </CartProvider>
         </ApiProvider>
         </AuthProvider>

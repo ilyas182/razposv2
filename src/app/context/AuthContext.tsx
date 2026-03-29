@@ -1,17 +1,25 @@
 "use client"
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
-    // Define any authentication-related functions or state here
-    checkAuth: () => Promise<boolean>;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    user: string | null;
+    checkAuth: () => Promise<any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     login: (username: string, password: string) => Promise<any>;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [user, setUser] = useState<string | null>(null);
+            const [isLoading, setIsLoading] = useState(true);
+            const router = useRouter();
+
             const checkAuth = async () => {
                 try {
                     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/frappe.auth.get_logged_user`, { 
@@ -26,11 +34,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     if (!res.ok) return false;
                     
                     const data = await res.json();
-                    return data
-                    // return !!data.message; // Frappe typically returns { message: "username" } on success
+                    return data; // Should contain { message: "username" } on success
                 } catch (error) {
                     console.error('Error checking authentication:', error);
-                    return false;
+                    throw error;
                 }
             };
             const login = async (usr: string, pwd: string) => {
@@ -50,6 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     }
                     
                     const data = await res.json();
+                    setIsAuthenticated(true);
+                    setUser(data.full_name); // Frappe login returns full_name
                     return data;
                 } catch (error) {
                     console.error('Error logging in:', error);
@@ -68,11 +77,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     });
                 } catch (error) {
                     console.error('Error logging out:', error);
+                } finally {
+                    setIsAuthenticated(false);
+                    setUser(null);
+                    router.push('/login');
                 }
             };
             
+            useEffect(() => {
+                const verifyAuth = async () => {
+                    setIsLoading(true);
+                    try {
+                        const data = await checkAuth();
+                        if (data && data.message) {
+                            setIsAuthenticated(true);
+                            setUser(data.message); // get_logged_user returns username in message
+                        } else {
+                            setIsAuthenticated(false);
+                            setUser(null);
+                        }
+                    } catch (error) {
+                        setIsAuthenticated(false);
+                        setUser(null);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                };
+                verifyAuth();
+            }, []);
+            
 return (
         <AuthContext.Provider value={{ 
+            isAuthenticated,
+            isLoading,
+            user,
             checkAuth,
             login,
             logout,
