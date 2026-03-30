@@ -9,7 +9,7 @@ import { useAuth } from "@/app/context/AuthContext";
 export default function Navbar() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     setMounted(true);

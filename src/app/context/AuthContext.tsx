@@ -6,6 +6,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     user: string | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkAuth: () => Promise<any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     login: (username: string, password: string) => Promise<any>;
@@ -96,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                             setIsAuthenticated(false);
                             setUser(null);
                         }
+                        // eslint-disable-next-line
                     } catch (error) {
                         setIsAuthenticated(false);
                         setUser(null);

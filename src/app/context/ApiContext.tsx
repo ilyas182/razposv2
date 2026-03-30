@@ -79,7 +79,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 let errorData;
                 try {
                     errorData = await response.json();
-                    //eslint-disable-next-line no-console
+                    // eslint-disable-next-line
                 } catch (e) {
                     errorData = { message: `Request failed with status ${response.status}: ${response.statusText}` };
                 }
