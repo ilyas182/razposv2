@@ -78,6 +78,6 @@ export default function Navbar() {
       
   ];
 
-  // @ts-expect-error ignore: SidebarNavigationSimple is a client component and cannot be rendered on the server
-  return <SidebarNavigationSimple activeUrl={activeUrl} items={navItems} footerItems={footerItems} showAccountCard={false} />;
+
+  return <SidebarNavigationSimple activeUrl={activeUrl ?? "/"} items={navItems} footerItems={footerItems} showAccountCard={false} />;
 }
