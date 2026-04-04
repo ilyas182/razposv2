@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 } finally {
                     setIsAuthenticated(false);
                     setUser(null);
-                    router.push('/login');
+                    router.push('/auth/login');
                 }
             };
             

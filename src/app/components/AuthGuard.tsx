@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { BarLoader } from 'react-spinners';
 
 // Define paths that should not be protected
-const publicPaths = ['/login'];
+const publicPaths = ['/auth/login'];
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading } = useAuth();
@@ -26,7 +26,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         // If user is not authenticated and is trying to access a private page,
         // redirect to the login page.
         if (!isAuthenticated && !pathIsPublic) {
-            router.push('/login');
+            router.push('/auth/login');
         }
 
         // If user is authenticated and tries to access a public page (like login),
