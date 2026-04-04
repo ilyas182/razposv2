@@ -18,9 +18,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         if (isLoading) {
             return;
         }
+        
 
-        // @ts-expect-error - This is just URLSearchParams, we can ignore the type error for now
-        const pathIsPublic = publicPaths.includes(pathname);
+        const pathIsPublic = publicPaths.includes(pathname ?? '');
         console.log(`AuthGuard: isAuthenticated=${isAuthenticated}, isLoading=${isLoading}, pathname=${pathname}, pathIsPublic=${pathIsPublic}`);
 
         // If user is not authenticated and is trying to access a private page,
@@ -42,8 +42,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     // If the route is public, or if the user is authenticated, render the children.
-    // @ts-expect-error - This is just URLSearchParams, we can ignore the type error for now
-    if (publicPaths.includes(pathname) || isAuthenticated) {
+
+    if (publicPaths.includes(pathname ?? '') || isAuthenticated) {
         return <>{children}</>;
     }
 
