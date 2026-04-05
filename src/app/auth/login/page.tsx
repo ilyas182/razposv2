@@ -16,6 +16,8 @@ export default function LoginPage() {
       // You may eventually want to update it to accept credentials (username/password).
       const testUsername = process.env.NEXT_PUBLIC_LOGIN_USERNAME || '';
       const testPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || '';
+      console.log("testUsername:", testUsername);
+      console.log("testPassword:", testPassword);
       const result = await login(testUsername, testPassword);
       setStatus("Login successful!");
       toast.success("Logged in successfully");
