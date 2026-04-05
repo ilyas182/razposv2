@@ -72,7 +72,7 @@ export default function Navbar() {
     },
     {
       label: isAuthenticated ? "Logout" : "Login",
-      href: isAuthenticated ? "/logout" : "/login",
+      href: isAuthenticated ? "/auth/logout" : "/auth/login",
       icon: isAuthenticated ? LogOut01 : LogIn01,
     },
       

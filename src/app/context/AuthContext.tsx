@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const logout = async () => {
                 try {
                     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/logout`, {
-                        method: 'POST',
+                        method: 'GET',
                         credentials: 'include', // Tells browser to clear the session cookie
                         headers: {
                             'Accept': 'application/json',

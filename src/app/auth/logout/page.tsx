@@ -11,7 +11,8 @@ export default function LogoutPage() {
     useEffect(() => {
         const performLogout = async () => {
             try {
-                await logout();
+                const data = await logout();
+                console.log('Logout successful:', data);
                 router.push('/auth/login');
             } catch (error) {
                 console.error('Logout failed:', error);
