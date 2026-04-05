@@ -14,8 +14,9 @@ export default function LoginPage() {
     try {
       // Note: Your AuthContext login function currently takes no arguments.
       // You may eventually want to update it to accept credentials (username/password).
-      // @ts-expect-error testing
-      const result = await login(process.env.LOGIN_USERNAME, process.env.LOGIN_PASSWORD)
+      const testUsername = process.env.NEXT_PUBLIC_LOGIN_USERNAME || '';
+      const testPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || '';
+      const result = await login(testUsername, testPassword);
       setStatus("Login successful!");
       toast.success("Logged in successfully");
       console.log("Login result:", result);
