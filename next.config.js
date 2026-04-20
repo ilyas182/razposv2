@@ -18,6 +18,15 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 });
 
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        // This intercepts local calls to /api and proxies them to Frappe
+        source: '/api/:path*',
+        destination: `${process.env.FRAPPE_API_URL}/api/:path*`,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
