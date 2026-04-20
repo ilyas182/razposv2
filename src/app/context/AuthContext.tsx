@@ -91,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     try {
                         const data = await checkAuth();
                         if (data && data.message) {
+                        // if (data && data.message && data.message !== 'Guest') {
                             setIsAuthenticated(true);
                             setUser(data.message); // get_logged_user returns username in message
                         } else {
