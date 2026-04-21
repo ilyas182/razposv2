@@ -23,9 +23,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             const checkAuth = async () => {
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/frappe.auth.get_logged_user`, { 
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+                    const res = await fetch(`${baseUrl}/api/method/frappe.auth.get_logged_user`, { 
                         method: 'GET',
                         credentials: 'include', // Sends the session cookie to the backend
+                        cache: 'no-store', // Prevent PWA / Service Worker from caching the auth status
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
@@ -43,9 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
             const login = async (usr: string, pwd: string) => {
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/login`, { 
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+                    const res = await fetch(`${baseUrl}/api/method/login`, { 
                         method: 'POST', 
                         credentials: 'include', // Tells browser to accept the 'Set-Cookie' header
+                        cache: 'no-store',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
@@ -68,9 +72,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
             const logout = async () => {
                 try {
-                    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/logout`, {
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+                    await fetch(`${baseUrl}/api/method/logout`, {
                         method: 'GET',
                         credentials: 'include', // Tells browser to clear the session cookie
+                        cache: 'no-store',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'

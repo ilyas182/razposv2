@@ -60,10 +60,12 @@ export function ApiProvider({ children }: { children: ReactNode }) {
      * It automatically includes credentials, sets JSON headers, and handles non-OK responses.
      */
     const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const url = `${baseUrl}${endpoint}`;
 
         const config: RequestInit = {
             credentials: 'include',
+            cache: 'no-store', // Prevent PWA Service Worker caching
             ...options,
             headers: {
                 'Content-Type': 'application/json',
