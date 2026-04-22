@@ -21,6 +21,17 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        // Tenant: One18 Bakery
+        source: '/api/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'one18bakery-razposv2.vercel.app',
+          },
+        ],
+        destination: 'https://razpos.s.frappe.cloud/api/:path*', // change to real one18bakery ERPnext instance in future
+      },
+      {
         // This intercepts local calls to /api and proxies them to Frappe
         source: '/api/:path*',
         destination: `${process.env.FRAPPE_API_URL}/api/:path*`,
