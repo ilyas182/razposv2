@@ -68,7 +68,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     // 3. The Multi-Tenant Magic: Extract the subdomain
-    const subdomain = hostname.split('.')[0]; // Grabs "one18bakery"
+    const subdomain = hostname.split('-')[0]; // Grabs "one18bakery"
 
     // 4. Construct the dynamic backend URL 
     // https://razpos.s.frappe.cloud/app/home (for testing)
