@@ -55,32 +55,12 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 export function ApiProvider({ children }: { children: ReactNode }) {
   const isStaging = process.env.NEXT_PUBLIC_ENV === 'staging';
 
-  const getDynamicFrappeUrl = () => {
-    // 1. Safety check: Ensure this is running in the browser, not the server
-    if (typeof window === 'undefined') return ''; 
-
-    const hostname = window.location.hostname; // e.g., "one18bakery.razpos.com"
-
-    // 2. Fallback for your local development environment
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        // Here, it's okay to use your .env variable!
-        return process.env.NEXT_PUBLIC_FRAPPE_URL_API || 'https://test.frappe.cloud'; 
-    }
-
-    // 3. The Multi-Tenant Magic: Extract the subdomain
-    const subdomain = hostname.split('-')[0]; // Grabs "one18bakery"
-
-    // 4. Construct the dynamic backend URL 
-    // https://razpos.s.frappe.cloud/app/home (for testing)
-    return `https://${subdomain}.frappe.cloud`;
-};
     /**
      * A centralized fetch wrapper for all API calls.
      * It automatically includes credentials, sets JSON headers, and handles non-OK responses.
      */
     const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
-        // const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        const baseUrl = getDynamicFrappeUrl();
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
         const url = `${baseUrl}${endpoint}`;
 
         const config: RequestInit = {
