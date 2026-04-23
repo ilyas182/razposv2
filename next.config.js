@@ -29,7 +29,7 @@ const nextConfig = {
             value: 'one18bakery-razposv2.vercel.app',
           },
         ],
-        destination: 'https://razpos.s.frappe.cloud/api/:path*', // change to real one18bakery ERPnext instance in future
+        destination: `${process.env.FRAPPE_API_URL}/api/:path*`, // change to real one18bakery ERPnext instance when ready
       },
       {
         // This intercepts local calls to /api and proxies them to Frappe
