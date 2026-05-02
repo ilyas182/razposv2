@@ -11,6 +11,8 @@ interface AuthContextType {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     login: (username: string, password: string) => Promise<any>;
     logout: () => Promise<void>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fetchAllowedRegisters: (userEmail: string) => Promise<any[]>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -114,6 +116,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 };
                 verifyAuth();
             }, []);
+
+            const fetchAllowedRegisters = async (userEmail: string) => {
+              const backendUrl = process.env.NEXT_PUBLIC_API_URL || "";// e.g., one18bakery.frappe.cloud
+
+              try {
+                const response = await fetch(
+                  `${backendUrl}/api/method/frappe.client.get_list`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      // ⚠️ CRITICAL: Ensure your auth is passed here!
+                      // If using API keys: 'Authorization': `token ${apiKey}:${apiSecret}`
+                      // If using cookies: credentials: 'include' (or 'omit' if handled elsewhere)
+                    },
+                    body: JSON.stringify({
+                      doctype: "POS Profile",
+                      // Tell Frappe exactly what fields we want back
+                      fields: ["name", "company", "warehouse"],
+                      // This is Frappe's magic syntax to filter a parent by a child table!
+                      // Format: ['Child DocType Name', 'field_name', 'operator', 'value']
+                      filters: [["POS Profile User", "user", "=", userEmail]],
+                    }),
+                  },
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(data.exc_type || "Failed to fetch profiles");
+                }
+
+                // Returns an array: [{ name: "Tampines...", company: "...", warehouse: "..." }]
+                return data.message || [];
+              } catch (error) {
+                console.error("Error fetching POS Profiles:", error);
+                return [];
+              }
+            };
             
 return (
         <AuthContext.Provider value={{ 
@@ -123,6 +165,7 @@ return (
             checkAuth,
             login,
             logout,
+            fetchAllowedRegisters
         }}>
             {children}
         </AuthContext.Provider>

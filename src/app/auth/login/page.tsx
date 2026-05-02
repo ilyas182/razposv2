@@ -3,70 +3,90 @@
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { BarLoader } from "react-spinners";
 
 export default function LoginPage() {
-  const { login, checkAuth, logout } = useAuth();
-  const [status, setStatus] = useState<string>("Idle");
+  const { login, fetchAllowedRegisters } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
+    
     try {
-      // Note: Your AuthContext login function currently takes no arguments.
-      // You may eventually want to update it to accept credentials (username/password).
-      const testUsername = process.env.NEXT_PUBLIC_LOGIN_USERNAME || '';
-      const testPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || '';
-      console.log("testUsername:", testUsername);
-      console.log("testPassword:", testPassword);
-      const result = await login(testUsername, testPassword);
-      setStatus("Login successful!");
+      await login(username, password);
+      
+      // Fetch allowed registers for the user to determine their POS Profile
+      const registers = await fetchAllowedRegisters(username);
+      console.log("Allowed POS Profiles:", registers);
+      
       toast.success("Logged in successfully");
-      console.log("Login result:", result);
+      
+      // Note: You can add logic here to prompt the user to select a register 
+      // if they have multiple, or save the selected profile to context/localStorage.
+      
+      router.push("/");
     } catch (error) {
-      setStatus("Login failed.");
-      toast.error("Failed to login");
+      toast.error("Failed to login. Please check your credentials.");
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCheckAuth = async () => {
-    const isAuthenticated = await checkAuth();
-    setStatus(isAuthenticated ? "Authenticated" : "Not Authenticated");
-    if (isAuthenticated) {
-      toast.success("User is authenticated");
-    } else {
-      toast.error("User is NOT authenticated");
-    }
-  };
-
-  const handleLogout = () => {
-    logout(); // Your logout function is currently empty in the context, you'll need to implement it
-    setStatus("Logged out");
-    toast.success("Logged out");
-  };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 font-sans text-black">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-bold text-center text-gray-900">Test Authentication</h1>
-        
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-100 rounded text-center text-sm font-mono text-gray-700">
-            Status: {status}
-          </div> 
-
-          <button onClick={handleLogin} disabled={isLoading} className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 disabled:opacity-50 transition-colors">
-            {isLoading ? "Logging in..." : "Trigger Login"}
-          </button>
-          <button onClick={handleCheckAuth} className="w-full border border-purple-600 text-purple-600 py-2 px-4 rounded-md hover:bg-purple-50 transition-colors">
-            Check Auth Status
-          </button>
-          <button onClick={handleLogout} className="w-full border border-red-600 text-red-600 py-2 px-4 rounded-md hover:bg-red-50 transition-colors">
-            Trigger Logout
-          </button>
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 border border-gray-100">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+          <p className="text-sm text-gray-500">Sign in to your RAZPOS account</p>
         </div>
+        
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700" htmlFor="username">
+              Email or Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all bg-white text-black"
+              placeholder="Enter your email or username"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all bg-white text-black"
+              placeholder="Enter your password"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isLoading} 
+            className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 disabled:opacity-70 disabled:cursor-not-allowed transition-colors font-medium flex justify-center items-center h-12"
+          >
+            {isLoading ? <BarLoader color="#ffffff" width={60} /> : "Sign In"}
+          </button>
+        </form>
       </div>
     </div>
   );
