@@ -21,8 +21,8 @@ export default function LoginPage() {
       await login(username, password);
       
       // Fetch allowed registers for the user to determine their POS Profile
-      const registers = await fetchAllowedRegisters(username);
-      console.log("Allowed POS Profiles:", registers);
+      // const registers = await fetchAllowedRegisters(username);
+      // console.log("Allowed POS Profiles:", registers);
       
       toast.success("Logged in successfully");
       

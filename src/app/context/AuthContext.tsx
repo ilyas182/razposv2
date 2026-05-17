@@ -66,6 +66,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     const data = await res.json();
                     setIsAuthenticated(true);
                     setUser(data.full_name); // Frappe login returns full_name
+                    const userEmail = await checkAuth();
+                    console.log(userEmail)
+                    const allowedRegisters = await fetchAllowedRegisters(userEmail.message);
+                    console.log('allowed registers: ', allowedRegisters)
+                    if (allowedRegisters.length > 1) {
+                        console.log('allowed: ', allowedRegisters)
+                    }
+                    else 
+                        console.log('allowed: 1')
                     return data;
                 } catch (error) {
                     console.error('Error logging in:', error);
@@ -81,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         cache: 'no-store',
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         }
                     });
                 } catch (error) {
@@ -118,37 +127,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }, []);
 
             const fetchAllowedRegisters = async (userEmail: string) => {
-              const backendUrl = process.env.NEXT_PUBLIC_API_URL || "";// e.g., one18bakery.frappe.cloud
-
               try {
-                const response = await fetch(
-                  `${backendUrl}/api/method/frappe.client.get_list`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Accept: "application/json",
-                      // ⚠️ CRITICAL: Ensure your auth is passed here!
-                      // If using API keys: 'Authorization': `token ${apiKey}:${apiSecret}`
-                      // If using cookies: credentials: 'include' (or 'omit' if handled elsewhere)
-                    },
-                    body: JSON.stringify({
-                      doctype: "POS Profile",
-                      // Tell Frappe exactly what fields we want back
-                      fields: ["name", "company", "warehouse"],
-                      // This is Frappe's magic syntax to filter a parent by a child table!
-                      // Format: ['Child DocType Name', 'field_name', 'operator', 'value']
-                      filters: [["POS Profile User", "user", "=", userEmail]],
-                    }),
+                console.log('fetching pos profile for: ', userEmail)
+                // Hit the secure internal Next.js API route instead of Frappe directly
+                const response = await fetch('/api/pos-profiles', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
                   },
-                );
-
+                  body: JSON.stringify({ userEmail })
+                });
                 const data = await response.json();
+                console.log('response:', data)
 
                 if (!response.ok) {
-                  throw new Error(data.exc_type || "Failed to fetch profiles");
+                  throw new Error(data.error || "Failed to fetch profiles");
                 }
-
+                
                 // Returns an array: [{ name: "Tampines...", company: "...", warehouse: "..." }]
                 return data.message || [];
               } catch (error) {
