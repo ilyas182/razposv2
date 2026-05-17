@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
 
 export default function LoginPage() {
-  const { login, fetchAllowedRegisters } = useAuth();
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,10 +19,6 @@ export default function LoginPage() {
     
     try {
       await login(username, password);
-      
-      // Fetch allowed registers for the user to determine their POS Profile
-      // const registers = await fetchAllowedRegisters(username);
-      // console.log("Allowed POS Profiles:", registers);
       
       toast.success("Logged in successfully");
       
