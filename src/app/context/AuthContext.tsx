@@ -1,4 +1,5 @@
 "use client"
+/* eslint-disable */
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -6,13 +7,16 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     user: string | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setUser: React.Dispatch<React.SetStateAction<string | null>>;
     checkAuth: () => Promise<any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     login: (username: string, password: string) => Promise<any>;
     logout: () => Promise<void>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fetchAllowedRegisters: (userEmail: string) => Promise<any[]>;
+    selectProfile: (profileName: string) => void;
+    activePosProfile: string | null;
+    availableProfiles: any[]; // Holds multiple profiles for the modal
+    setAvailableProfiles: React.Dispatch<React.SetStateAction<any[]>>; // Setter for availableProfiles
+    setActivePosProfile: React.Dispatch<React.SetStateAction<string | null>>; // Setter for activePosProfile
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +25,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [user, setUser] = useState<string | null>(null);
             const [isLoading, setIsLoading] = useState(true);
+            const [activePosProfile, setActivePosProfile] = useState<string | null>(null);
+            const [availableProfiles, setAvailableProfiles] = useState<any[]>([]); // Holds multiple profiles for the modal
             const router = useRouter();
 
             const checkAuth = async () => {
@@ -69,18 +75,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     const userEmail = await checkAuth();
                     console.log(userEmail)
                     const allowedRegisters = await fetchAllowedRegisters(userEmail.message);
-                    console.log('allowed registers: ', allowedRegisters)
-                    if (allowedRegisters.length > 1) {
-                        console.log('allowed: ', allowedRegisters)
+                    console.log('allowedRegisters:', allowedRegisters)
+                    if (allowedRegisters.length === 0) {
+                      alert("Your account is not assigned to any branch.");
+                        // setIsAuthenticated(false);
                     }
-                    else 
-                        console.log('allowed: 1')
+
+                    if (allowedRegisters.length === 1) {
+                      // STAFF SCENARIO: Only 1 register. Save it and go straight to Home.
+                      setActivePosProfile(allowedRegisters[0].name);
+                      localStorage.setItem(
+                        "active_pos_profile",
+                        allowedRegisters[0].name,
+                      );
+                      router.push("/");
+                    } else {
+                      // MANAGER SCENARIO: Multiple registers.
+                      // Save them to state so the Modal can see them, but DO NOT route to /home yet!
+                      console.log('Setting availableProfiles in context:', allowedRegisters);
+                      setAvailableProfiles(allowedRegisters);
+                    }
+                    
                     return data;
                 } catch (error) {
                     console.error('Error logging in:', error);
                     throw error;
                 }
             };
+
+            const selectProfile = (profileName: string) => {
+              setActivePosProfile(profileName);
+              localStorage.setItem("active_pos_profile", profileName);
+              setAvailableProfiles([]); // Clear the array to close the modal
+              router.push("/home"); // Now we move to the POS!
+            };
+
             const logout = async () => {
                 try {
                     const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
@@ -138,7 +167,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   body: JSON.stringify({ userEmail })
                 });
                 const data = await response.json();
-                console.log('response:', data)
 
                 if (!response.ok) {
                   throw new Error(data.error || "Failed to fetch profiles");
@@ -157,10 +185,16 @@ return (
             isAuthenticated,
             isLoading,
             user,
+            setUser,
             checkAuth,
             login,
             logout,
-            fetchAllowedRegisters
+            fetchAllowedRegisters,
+            activePosProfile,
+            availableProfiles,
+            selectProfile,
+            setAvailableProfiles,
+            setActivePosProfile,
         }}>
             {children}
         </AuthContext.Provider>

@@ -9,7 +9,7 @@ import { BarLoader } from 'react-spinners';
 const publicPaths = ['/auth/login'];
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated, isLoading, activePosProfile } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -31,10 +31,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
         // If user is authenticated and tries to access a public page (like login),
         // redirect them to the home page.
-        if (isAuthenticated && pathIsPublic) {
+        if (isAuthenticated && pathIsPublic && activePosProfile) {
             router.push('/');
         }
-    }, [isLoading, isAuthenticated, pathname, router]);
+    }, [isLoading, isAuthenticated, pathname, router, activePosProfile]);
 
     // While loading authentication status, show a full-page loader
     if (isLoading) {

@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
+import BranchSelectionModal from "@/app/components/modals/login/BranchSelectionModal";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, setAvailableProfiles } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+        if (setAvailableProfiles) {
+            setAvailableProfiles([]);
+        }
+    }, [setAvailableProfiles]);
+    
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,7 +32,7 @@ export default function LoginPage() {
       // Note: You can add logic here to prompt the user to select a register 
       // if they have multiple, or save the selected profile to context/localStorage.
       
-      router.push("/");
+      // router.push("/");
     } catch (error) {
       toast.error("Failed to login. Please check your credentials.");
       console.error(error);
@@ -83,6 +90,7 @@ export default function LoginPage() {
             {isLoading ? <BarLoader color="#ffffff" width={60} /> : "Sign In"}
           </button>
         </form>
+        <BranchSelectionModal />
       </div>
     </div>
   );
