@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
 import BranchSelectionModal from "@/app/components/modals/login/BranchSelectionModal";
 
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
         if (setAvailableProfiles) {
